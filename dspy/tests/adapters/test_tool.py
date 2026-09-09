@@ -774,3 +774,54 @@ def test_tool_call_execute_with_local_functions():
             globals().pop("local_add", None)
 
     main()
+
+
+def test_serpapi_bridge_reports_missing_optional_dependency(monkeypatch):
+    import builtins
+
+    original_import = builtins.__import__
+
+    def without_serpapi(name, *args, **kwargs):
+        if name == "serpapi_search_tools":
+            raise ModuleNotFoundError("No module named 'serpapi_search_tools'", name="serpapi_search_tools")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", without_serpapi)
+    with pytest.raises(ImportError, match=r"dspy\[serpapi\]"):
+        dspy.Tool.from_serpapi()
+
+
+def test_serpapi_bridge_controls_provider():
+    with pytest.raises(ValueError, match="omit 'provider'"):
+        dspy.Tool.from_serpapi(provider="langchain")
+
+
+def test_serpapi_bridge_requires_a_constructor():
+    def already_created_search(query: str) -> str:
+        return query
+
+    with pytest.raises(TypeError, match="constructor"):
+        dspy.Tool.from_serpapi(already_created_search)
+
+
+def test_serpapi_bridge_rejects_non_callable_factory_result():
+    def invalid_factory(*, provider, timeout):
+        return {}
+
+    with pytest.raises(TypeError, match="must return a callable"):
+        dspy.Tool.from_serpapi(invalid_factory)
+
+
+def test_serpapi_bridge_does_not_hide_broken_dependency(monkeypatch):
+    import builtins
+
+    original_import = builtins.__import__
+
+    def broken_dependency(name, *args, **kwargs):
+        if name == "serpapi_search_tools":
+            raise ModuleNotFoundError("Missing nested dependency", name="nested_dependency")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", broken_dependency)
+    with pytest.raises(ModuleNotFoundError, match="Missing nested dependency"):
+        dspy.Tool.from_serpapi()

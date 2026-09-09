@@ -70,6 +70,16 @@ with dspy.context(adapter=adapter):
 
 When native calling is active and the LM supports it, the adapter converts each tool with `Tool.format_as_litellm_function_call()` and sends the resulting descriptors in the LM request. Otherwise, it keeps tool selection in DSPy's normal adapter-formatted fields. The same `Tool` works in either mode.
 
+## SerpApi search tools
+
+`dspy.Tool.from_serpapi()` creates a web-search tool using SerpApi Search Tools.
+Install the `serpapi` extra. To select another capability, pass its constructor,
+for example `dspy.Tool.from_serpapi(news_search, result_limit=5)`.
+The bridge selects SerpApi's native DSPy provider, preserving its shared input
+schema, and supports direct sync calls and thread-offloaded `acall` calls. See
+[Web Research with SerpApi](../tutorials/serpapi/index.md)
+for configuration, a runnable agent, and offline testing.
+
 ## Structured tool calls and results
 
 `dspy.ToolCalls` represents model-requested calls independently of any provider's wire format. Each `ToolCalls.ToolCall` carries an optional provider call ID, a tool name, and an argument dictionary:
@@ -115,6 +125,10 @@ Validates, coerces, and executes tool arguments through synchronous or asynchron
 
 **`Tool.format_as_litellm_function_call()`** → `dict`
 Returns the OpenAI/LiteLLM-style function descriptor used by adapters for native calling.
+
+**`Tool.from_serpapi(factory=None, **kwargs)`** → `Tool`
+Creates a native tool from a SerpApi constructor (default: `web_search`). Constructor
+settings stay application-controlled; the bridge selects the native DSPy provider.
 
 **`Tool.from_mcp_tool(session, tool, *, result_mode="text")`** → `Tool`
 Wraps a remote MCP tool as an asynchronous DSPy tool. Set `result_mode="structured"` to return structured MCP results when available.

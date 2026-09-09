@@ -13,6 +13,7 @@
             - format
             - format_as_litellm_function_call
             - from_langchain
+            - from_serpapi
             - from_mcp_tool
             - is_streamable
             - parse_lm_response

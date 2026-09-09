@@ -235,6 +235,42 @@ class Tool(Type):
         return convert_mcp_tool(session, tool, result_mode=result_mode)
 
     @classmethod
+    def from_serpapi(cls, factory: Callable | None = None, **kwargs: Any) -> "Tool":
+        """Create a DSPy tool using a SerpApi Search Tools constructor.
+
+        Args:
+            factory: A constructor such as ``serpapi_search_tools.news_search``.
+                Defaults to ``web_search``. Pass the constructor, not its result.
+            **kwargs: Constructor settings such as ``api_key``, ``client``,
+                ``timeout``, ``result_limit``, or ``allowed_engines``. DSPy sets
+                ``provider="dspy"``; do not supply ``provider``. The SerpApi
+                adapter supplies the full provider-neutral input schema.
+
+        Returns:
+            A Tool that preserves the search callable's signature and metadata.
+            Sync calls run directly; ``acall`` offloads the search to DSPy's
+            bounded worker pool. A 20-second timeout is used when omitted or
+            set to ``None``.
+            SerpApi remains responsible for request and business-rule validation.
+
+        Examples:
+
+        ```python
+        import dspy
+        from serpapi_search_tools import news_search
+
+        web = dspy.Tool.from_serpapi(result_limit=5, timeout=20.0)
+        news = dspy.Tool.from_serpapi(news_search, result_limit=5, timeout=20.0)
+        # With SERPAPI_API_KEY configured:
+        # web(query="DSPy documentation")
+        # await news.acall(query="DSPy releases")
+        ```
+        """
+        from dspy.utils.serpapi import create_serpapi_tool
+
+        return create_serpapi_tool(factory, **kwargs)
+
+    @classmethod
     def from_langchain(cls, tool: "BaseTool") -> "Tool":
         """
         Build a DSPy tool from a LangChain tool.
