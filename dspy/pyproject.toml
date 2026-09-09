@@ -84,6 +84,9 @@ dspy = ["primitives/*.js"]
 [project.urls]
 homepage = "https://github.com/stanfordnlp/dspy"
 
+[tool.uv.sources]
+serpapi-search-tools = { path = "../serpapi-search-tools-python" }
+
 [tool.coverage.run]
 branch = true
 omit = [
