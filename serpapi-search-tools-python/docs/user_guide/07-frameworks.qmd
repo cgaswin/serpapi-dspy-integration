@@ -1,0 +1,94 @@
+---
+title: Agent SDKs
+guide-section: Start Here
+---
+
+# Use the agent SDK you already know
+
+Create the search capabilities you need and add them to your SDK's normal tool
+collection:
+
+```python
+from serpapi_search_tools import hotels_search, maps_search, web_search
+
+tools = [web_search(), maps_search(), hotels_search()]
+```
+
+The package prepares the tool name, description, inputs, validation, and
+SerpApi request. You continue to choose the model and run the agent through
+your SDK as usual.
+
+## Installation choices
+
+If your agent SDK is already installed, add only the base package:
+
+```bash
+pip install serpapi-search-tools
+```
+
+If you want this package to install a compatible SDK dependency too, use its
+extra. For example:
+
+```bash
+pip install "serpapi-search-tools[openai-agents]"
+```
+
+Replace `openai-agents` with the extra in the table below.
+
+## Supported SDKs
+
+| SDK | Extra / explicit provider | Supported range | Complete example |
+| --- | --- | --- | --- |
+| OpenAI Agents SDK | `openai-agents` | `openai-agents >=0.18.3,<1` | [OpenAI Agents](../docs/sdk-examples/openai_agents.html) |
+| Pydantic AI | `pydantic-ai` | `pydantic-ai >=1.30.1,<3` | [Pydantic AI](../docs/sdk-examples/pydantic_ai.html) |
+| LangChain | `langchain` | `langchain >=1.3.11,<2` | [LangChain](../docs/sdk-examples/langchain.html) |
+| LangGraph | `langgraph` | `langgraph >=1.2.6,<2` | [LangGraph](../docs/sdk-examples/langgraph.html) |
+| CrewAI | `crewai` | `crewai >=1.6.1,<2` | [CrewAI](../docs/sdk-examples/crewai.html) |
+| LlamaIndex | `llamaindex` | core `>=0.14.22,<0.15` | [LlamaIndex](../docs/sdk-examples/llamaindex.html) |
+| Claude Agent SDK | `claude-agent-sdk` | `claude-agent-sdk >=0.2.108,<1` | [Claude Agent SDK](../docs/sdk-examples/claude_agent_sdk.html) |
+| Microsoft Agent Framework | `microsoft-agent-framework` | `agent-framework-openai >=1.10.1,<2` | [Microsoft Agent Framework](../docs/sdk-examples/microsoft_agent_framework.html) |
+| AutoGen | `autogen` | AgentChat `>=0.7.5,<0.8` | [AutoGen](../docs/sdk-examples/autogen.html) |
+| Haystack | `haystack` | `haystack-ai >=2.30.2,<4` | [Haystack](../docs/sdk-examples/haystack.html) |
+| Agno | `agno` | `agno >=2.6.19,<3` | [Agno](../docs/sdk-examples/agno.html) |
+| smolagents | `smolagents` | `smolagents >=1.26,<2` | [smolagents](../docs/sdk-examples/smolagents.html) |
+| Google ADK | `google-adk` | `google-adk >=2.3,<3` | [Google ADK](../docs/sdk-examples/google_adk.html) |
+| Semantic Kernel | `semantic-kernel` | `semantic-kernel >=1.36,<2` | [Semantic Kernel](../docs/sdk-examples/semantic_kernel.html) |
+
+You only need dependencies for the SDKs you use. The base install remains small
+and also supports direct Python calls.
+
+## Automatic detection is the normal path
+
+When one supported SDK is installed, omit `provider`:
+
+```python
+from serpapi_search_tools import web_search
+
+tool = web_search()
+```
+
+If multiple supported SDK families are installed, automatic detection raises
+an error rather than selecting by import order. Pass the table's provider value
+explicitly:
+
+```python
+from serpapi_search_tools import web_search
+
+tool = web_search(provider="openai-agents")
+```
+
+Use the same explicit provider for every tool in one agent.
+LangGraph and LangChain count as one adapter family.
+
+## No supported SDK installed
+
+Automatic detection falls back to a normal callable. You can request that form
+directly with `provider="function"` for scripts, tests, or an unlisted agent
+framework. See [Support another agent SDK](configuration.html#support-another-agent-sdk).
+
+## Install only what your agent uses
+
+Each extra installs the packages needed to create tools for that SDK. Continue
+to install and configure the model integration your agent normally uses. In
+most applications, installing the base package plus one SDK extra keeps the
+environment easiest to understand and maintain.

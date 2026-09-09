@@ -1,0 +1,64 @@
+/* Mobile corrections layered over Great Docs 0.14. */
+@media (max-width: 991.98px) {
+  body.nav-sidebar:not(.gd-project-home) #quarto-header,
+  body.nav-sidebar:not(.gd-project-home) .quarto-secondary-nav {
+    transform: none !important;
+  }
+
+  body.gd-project-home .quarto-secondary-nav {
+    display: none;
+  }
+
+  body.gd-project-home #navbarCollapse {
+    display: none !important;
+  }
+
+  body.nav-sidebar .navbar-container {
+    flex-wrap: nowrap;
+  }
+
+  body.nav-sidebar .navbar-toggler {
+    order: 1;
+    flex: 0 0 auto;
+  }
+
+  body.nav-sidebar .navbar-brand-container {
+    order: 2;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    overflow: hidden;
+  }
+
+  body.nav-sidebar .navbar-brand {
+    min-width: 0;
+    max-width: 100%;
+    margin-right: 0;
+  }
+
+  body.nav-sidebar .navbar-title {
+    display: block;
+    font-size: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  body.nav-sidebar .quarto-navbar-tools {
+    order: 3;
+    flex: 0 0 auto;
+    padding: 0;
+  }
+
+  body.nav-sidebar #gd-navbar-widgets {
+    width: auto;
+  }
+
+  body.nav-sidebar #github-widget,
+  body.gd-project-home .gd-meta-sidebar {
+    display: none;
+  }
+}

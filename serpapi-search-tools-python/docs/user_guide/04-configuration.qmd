@@ -1,0 +1,338 @@
+---
+title: Common configuration
+guide-section: Start Here
+---
+
+# Configure a search tool
+
+Every public constructor follows the same pattern: choose the search capability,
+let the package detect your agent SDK, and add only the application-controlled
+defaults you need.
+
+```python
+from serpapi_search_tools import web_search
+
+tool = web_search()
+```
+
+Start with no options. Add configuration only when you have a clear reason,
+such as restricting engines, fixing a locale, limiting results, setting a
+currency, or selecting one SDK from a multi-SDK environment.
+
+## Three kinds of settings
+
+It helps to keep three layers separate:
+
+1. **Model inputs** are fields the agent supplies at invocation time, such as
+   `query`, hotel dates, or flight airports. Each dedicated tool page lists
+   these fields.
+2. **Constructor options** control how the Python tool is created, such as
+   `provider`, `name`, `timeout`, and web-engine choices.
+3. **`default_params`** are SerpApi engine parameters fixed by your application,
+   such as language, country, currency, safe search, or pagination.
+
+This separation keeps the agent's search inputs short while your application
+retains control of service-level settings.
+
+## Common constructor options
+
+All nine constructors accept these options:
+
+| Option | Default | When to use it |
+| --- | --- | --- |
+| `provider` | `"auto"` | Usually omit it. Select an SDK explicitly when multiple supported SDKs are installed, or use `"function"` for a callable. |
+| `api_key` | `None` | Pass a SerpApi key from a secret manager instead of using an environment variable. |
+| `client` | `None` | Replace the built-in client for tests, caching, logging, retries, or response reduction. |
+| `default_params` | `None` | Set supported SerpApi options such as locale, currency, filters, or pagination in application code. |
+| `timeout` | `None` | Set a request timeout on the built-in SerpApi client. |
+| `mode` | `SearchResultMode.COMPACT` | Return the main result data; use `SearchResultMode.FULL` to keep supporting sections and all fields on retained results. |
+| `response_format` | `SearchResultFormat.MARKDOWN` | Return readable Markdown by default, or use `SearchResultFormat.JSON` for structured application data. |
+| `result_limit` | tool-specific | Set the maximum number of items kept in each result list in either mode. Use `None` to keep all returned items. |
+| `include_examples` | `True` | Keep or remove the short invocation hint in the tool description. |
+| `name` | constructor name | Give separately configured tools distinct names the model can understand. |
+
+```python
+from serpapi_search_tools import news_search
+
+current_us_news = news_search(
+    default_params={"hl": "en", "gl": "us"},
+    result_limit=5,
+    timeout=20.0,
+    name="current_us_news",
+)
+```
+
+## Automatic SDK detection
+
+When exactly one supported agent SDK is installed, omit `provider`:
+
+```python
+from serpapi_search_tools import maps_search, web_search
+
+tools = [web_search(), maps_search()]
+```
+
+If multiple supported SDK families share an environment, automatic detection
+raises an error instead of silently choosing one. Make the selection explicit:
+
+```python
+from serpapi_search_tools import maps_search, web_search
+
+tools = [
+    web_search(provider="openai-agents"),
+    maps_search(provider="openai-agents"),
+]
+```
+
+LangGraph and LangChain count as one adapter family because both use the
+LangChain structured-tool adapter.
+
+If no supported SDK is installed, automatic detection returns a normal Python
+callable. `provider="function"` requests that callable explicitly and is useful
+for scripts, tests, and custom integrations.
+
+## Options that differ by tool
+
+The search inputs and useful SerpApi parameters depend on the capability:
+
+| Tool | Tool-specific configuration |
+| --- | --- |
+| [`web_search`](web_search.html) | `allowed_engines`, `default_engine`, plus per-engine web defaults |
+| [`news_search`](news_search.html) | Google News query-mode locale and query filters |
+| [`maps_search`](maps_search.html) | Typed location/zoom/nearby inputs plus Maps defaults |
+| [`images_search`](images_search.html) | Safe search and image filters |
+| [`shopping_search`](shopping_search.html) | `allowed_engines`, `default_engine`, and marketplace-specific defaults |
+| [`videos_search`](videos_search.html) | YouTube locale and filter token settings |
+| [`hotels_search`](hotels_search.html) | Typed stay/occupancy fields plus currency and property filters |
+| [`flights_search`](flights_search.html) | Typed route/passenger fields plus currency, airline, bag, stop, and time filters |
+| [`travel_explore_search`](travel_explore_search.html) | Typed destination constraints plus discovery filters |
+
+Read the dedicated page before adding engine-specific `default_params`.
+
+## Choose Markdown or JSON
+
+Markdown is the default response format. It gives agents readable headings, links, and tables without JSON syntax overhead:
+
+```python
+from serpapi_search_tools import web_search
+
+search = web_search(provider="function")
+print(search(query="Python packaging"))
+```
+
+Use JSON when application code needs named fields:
+
+```python
+import json
+
+from serpapi_search_tools import SearchResultFormat, web_search
+
+search = web_search(
+    provider="function",
+    response_format=SearchResultFormat.JSON,
+)
+response = json.loads(search(query="Python packaging"))
+print(response.get("organic_results", []))
+```
+
+`response_format` is fixed when the tool is created. It is not exposed to the model.
+
+## Choose compact or full results
+
+All tools default to `SearchResultMode.COMPACT`. Compact mode keeps the main result sections and omits metadata, request parameters, pagination, filters, and other supporting sections. Markdown keeps the corresponding result headings and tables. JSON also keeps non-list answer sections such as `answer_box` whole. If a successful JSON response has no supported result section, the tool returns `no_results: true` with available status and search information.
+
+| Tool | Default `result_limit` |
+| --- | ---: |
+| `web_search`, `maps_search`, `videos_search`, `flights_search` | `10` |
+| `news_search` | `20` |
+| `images_search` | `50` |
+| `shopping_search` | `60` |
+| `hotels_search` | `20` |
+| `travel_explore_search` | `50` |
+
+| Tool | Compact result families |
+| --- | --- |
+| `web_search` with Google | `answer_box`, `knowledge_graph`, `ai_overview`, `organic_results` |
+| `web_search` with Google Light | `answer_box`, `knowledge_graph`, `organic_results`, `related_questions`, `related_searches`, `top_stories` |
+| `web_search` with Bing | `answer_box`, `knowledge_graph`, `copilot_answer`, `organic_results` |
+| `web_search` with Yahoo | `answer_box`, `knowledge_graph`, `organic_results` |
+| `web_search` with DuckDuckGo | `knowledge_graph`, `organic_results` |
+| `news_search` | `news_results` |
+| `maps_search` | `local_results`; exact-place responses use `place_results` |
+| `images_search` | `images_results` |
+| `shopping_search` | `shopping_results` for Google Shopping; `organic_results` for Amazon, Walmart, and eBay |
+| `videos_search` | `video_results`, `shorts_results`, `channel_results`, `playlist_results`, `movie_results`, `category_results` |
+| `hotels_search` | `properties` |
+| `flights_search` | `best_flights`, `other_flights` |
+| `travel_explore_search` | `destinations` |
+
+`result_limit` is application configuration rather than a model input:
+
+```python
+from serpapi_search_tools import web_search
+
+broader_web_search = web_search(
+    result_limit=20,
+)
+```
+
+`result_limit` changes the returned result, not the SerpApi request. It applies independently to each supported JSON result list or Markdown result table. It does not shorten nested data such as flight legs, hotel amenities, product offers, or a single exact-place result. See the [`web_search`](web_search.html) and [`shopping_search`](shopping_search.html) pages for engine-specific retrieval and pagination options.
+
+Use full mode when application code needs supporting response sections or additional result fields. The tool's default result limit still applies:
+
+```python
+from serpapi_search_tools import SearchResultMode, web_search
+
+debug_search = web_search(
+    provider="function",
+    mode=SearchResultMode.FULL,
+    result_limit=10,
+)
+```
+
+To keep the complete SerpApi response, including all returned results, set both `mode=SearchResultMode.FULL` and `result_limit=None`.
+
+`mode` is a constructor option, not a model input. An agent cannot expand its
+own tool response and unexpectedly consume more context.
+
+See [Manage LLM context](managing_llm_context.html) for examples using compact, full, limited, and unlimited responses.
+
+## Restrict web and shopping engines
+
+Only `web_search` and `shopping_search` expose an `engine` choice to the model.
+Their constructor options define the exact enum in the generated schema:
+
+```python
+from serpapi_search_tools import WebSearchEngine, web_search
+
+tool = web_search(
+    allowed_engines=[WebSearchEngine.GOOGLE_LIGHT, WebSearchEngine.BING],
+    default_engine=WebSearchEngine.GOOGLE_LIGHT,
+)
+```
+
+`web_search` supports five general web engines and prefers `google_light`.
+`shopping_search` supports four commerce engines and prefers
+`google_shopping`. Fixed-engine tools do not show the model an engine field.
+
+## Use `default_params` safely
+
+These values are controlled by your Python application:
+
+```python
+from serpapi_search_tools import images_search
+
+safe_us_images = images_search(
+    default_params={"safe": "active", "hl": "en", "gl": "us"},
+)
+```
+
+Typed tool fields, including their declared defaults, win over matching
+`default_params`, and the package always controls `engine`. The following
+transport parameters are reserved and rejected in `default_params`:
+
+- `api_key`
+- `async`
+- `engine`
+- `output`
+
+A multi-engine tool sends the same defaults to every allowed engine. Parameter
+names and valid values often differ, so use only shared defaults or create
+separate tool instances with clear names:
+
+```python
+from serpapi_search_tools import web_search
+
+us_google = web_search(
+    allowed_engines=["google_light"],
+    default_params={"hl": "en", "gl": "us"},
+    result_limit=5,
+    name="us_google",
+)
+german_google = web_search(
+    allowed_engines=["google_light"],
+    default_params={"hl": "de", "gl": "de"},
+    result_limit=5,
+    name="german_google",
+)
+```
+
+Official engine references are linked from every dedicated tool page.
+
+## API keys
+
+Set the key in your local shell:
+
+```bash
+export SERPAPI_API_KEY="your-serpapi-key"
+```
+
+`SERPAPI_KEY` is also accepted. Generic variables such as `API_KEY` are ignored
+so a model-provider credential cannot be sent to SerpApi accidentally.
+
+The key is resolved when a real search runs. Creating a tool or inspecting its
+schema does not contact SerpApi. In production, you can pass `api_key=` using a
+value read from your secret manager.
+
+## Custom clients
+
+Pass `client=` for deterministic tests, caching, logging, retries, or a company
+HTTP wrapper. The object needs one synchronous `search(params)` method:
+
+```python
+import json
+
+from serpapi_search_tools import SearchResultFormat, SearchResultMode, hotels_search
+
+
+class RecordingClient:
+    def __init__(self):
+        self.requests = []
+
+    def search(self, params):
+        self.requests.append(params)
+        return {"search_metadata": {"status": "Success"}, "params": params}
+
+
+client = RecordingClient()
+search = hotels_search(
+    provider="function",
+    client=client,
+    mode=SearchResultMode.FULL,
+    response_format=SearchResultFormat.JSON,
+)
+result = json.loads(
+    search(
+        query="hotels in Kyoto",
+        check_in_date="2030-08-01",
+        check_out_date="2030-08-04",
+    )
+)
+print(result["params"])
+```
+
+When a custom client is supplied, the package does not create the built-in
+client or read a SerpApi key.
+
+## Use another agent SDK {#support-another-agent-sdk}
+
+Request a normal callable and wrap it with the SDK's documented custom-tool API:
+
+```python
+from serpapi_search_tools import flights_search
+
+search_flights = flights_search(provider="function")
+
+tool = CustomTool(
+    name=search_flights.__name__,
+    description=search_flights.__doc__,
+    function=search_flights,
+)
+```
+
+The callable carries a typed Python signature. Follow your SDK's custom-tool
+guide and use the inputs documented on the matching search-tool page. If the
+SDK asks for JSON Schema, define those same fields explicitly.
+
+For complete combinations built from these options, continue with
+[Recipes](recipes.html) or [Runnable examples](examples.html).

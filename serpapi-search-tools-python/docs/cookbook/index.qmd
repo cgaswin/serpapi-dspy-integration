@@ -1,0 +1,49 @@
+---
+title: Agent cookbook
+description: Build outcome-driven agents with live SerpApi search.
+---
+
+# Build agents that finish real work
+
+Start with the SDK you already use. Every recipe turns an official framework
+pattern into a complete, source-backed workflow and saves a Markdown artifact
+you can inspect, edit, or share.
+
+The cookbook uses compact Markdown responses from each SerpApi tool. The agents pass search results directly to models and do not parse JSON fields.
+
+## Choose a cookbook
+
+| SDK | Outcome | Search capabilities |
+| --- | --- | --- |
+| [LangChain](langchain.html) | Deep market research brief | Web and news |
+| [LangGraph](langgraph.html) | Product-launch intelligence | Web, news, and shopping |
+| [CrewAI](crewai.html) | Collaborative trip plan | Flights, hotels, and maps |
+| [LlamaIndex](llamaindex.html) | Remote-work destination brief | Travel explore, web, and maps |
+| [OpenAI Agents](openai-agents.html) | Managed research report | Web and news |
+| [Claude Agent SDK](claude-agent-sdk.html) | Source-verification memo | Web and news |
+| [Pydantic AI](pydantic-ai.html) | Visual location scout | Images, maps, and web |
+| [Microsoft Agent Framework](microsoft-agent-framework.html) | Technology due diligence | Web and news |
+| [AutoGen](autogen.html) | Company intelligence memo | Web and news |
+| [Haystack](haystack.html) | Weekly industry newsletter | News and web |
+| [Semantic Kernel](semantic-kernel.html) | Competitor brief | Web and news |
+| [Agno](agno.html) | Market research report | Web, news, and shopping |
+| [smolagents](smolagents.html) | Purchase research assistant | Shopping, images, and videos |
+| [Google ADK](google-adk.html) | Retail location strategy | Maps, web, and news |
+
+## Configure once
+
+Clone the repository, then copy the cookbook environment template to the
+repository root:
+
+```bash
+cp cookbook/sample.env .env
+```
+
+Every recipe needs `SERPAPI_API_KEY` (or `SERPAPI_KEY`) and the model-provider
+key listed on its page. Each page includes the exact `uv run` command.
+
+Set `COOKBOOK_PROMPT` to replace the default brief. Reports are written to
+`cookbook-output/` unless `COOKBOOK_OUTPUT_DIR` is set.
+
+The commands use `--isolated --no-project` so the local recipe runs against the
+published package and its SDK extra instead of importing this checkout.
