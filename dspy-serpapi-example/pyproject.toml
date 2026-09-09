@@ -1,0 +1,15 @@
+[project]
+name = "dspy-serpapi-example"
+version = "0.1.0"
+description = "Minimal DSPy and SerpApi integration example"
+requires-python = ">=3.10"
+dependencies = [
+    "dspy>=3.3.1,<4",
+    "mlflow>=3.0,<4",
+    "python-dotenv>=1.0,<2",
+    "serpapi-search-tools>=1.1.0,<2",
+]
+
+[tool.uv.sources]
+dspy = { path = "../dspy", editable = true }
+serpapi-search-tools = { path = "../serpapi-search-tools-python", editable = true }
