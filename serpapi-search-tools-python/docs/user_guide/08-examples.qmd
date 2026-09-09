@@ -68,11 +68,12 @@ Set `SERPAPI_API_KEY` plus the model provider key used by the script, then run
 the published package with the matching optional extra from the project root:
 
 ```bash
+uv run --isolated --no-project --with dspy --with serpapi-search-tools --with python-dotenv examples/dspy_openai.py
 uv run --isolated --no-project --with 'serpapi-search-tools[openai-agents]' --with python-dotenv examples/openai_agents_openai.py
 uv run --isolated --no-project --with 'serpapi-search-tools[openai-agents]' --with python-dotenv examples/openai_agents_travel_planner.py
 ```
 
-The `examples/` directory includes OpenAI Agents, Pydantic AI, LangChain,
+The `examples/` directory includes DSPy, OpenAI Agents, Pydantic AI, LangChain,
 LangGraph, CrewAI, LlamaIndex, Claude Agent SDK, Microsoft Agent Framework,
 AutoGen, Haystack, Agno, smolagents, Google ADK, and Semantic Kernel examples.
 

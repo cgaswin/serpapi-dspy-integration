@@ -207,6 +207,28 @@ def as_function_tool(definition: ToolDefinition) -> Callable[..., str]:
     return _with_tool_metadata(definition)
 
 
+def as_dspy_tool(definition: ToolDefinition) -> Any:
+    try:
+        import dspy
+    except ImportError as exc:
+        raise _direct_dependency_error("dspy", exc) from exc
+
+    source_properties = cast(Mapping[str, Mapping[str, Any]], definition.input_schema["properties"])
+    properties = {name: dict(schema) for name, schema in source_properties.items()}
+    required = set(cast(list[str], definition.input_schema.get("required", [])))
+    for name, schema in properties.items():
+        if name not in required and "default" not in schema:
+            schema["default"] = None
+            if isinstance(schema.get("type"), str):
+                schema["type"] = [schema["type"], "null"]
+    return dspy.Tool(
+        _with_tool_metadata(definition),
+        name=definition.name,
+        desc=definition.description,
+        args=properties,
+    )
+
+
 def as_langchain_tool(definition: ToolDefinition) -> Any:
     try:
         from langchain_core.tools import StructuredTool
@@ -539,6 +561,7 @@ def as_provider_tool(
 
     adapters: dict[str, Callable[[ToolDefinition], Any]] = {
         "function": as_function_tool,
+        "dspy": as_dspy_tool,
         "langchain": as_langchain_tool,
         "langgraph": as_langchain_tool,
         "crewai": as_crewai_tool,

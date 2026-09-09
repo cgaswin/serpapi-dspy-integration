@@ -12,7 +12,7 @@ your existing agent SDK or as normal Python functions.
 
 ## Supported agent SDKs
 
-The package works with OpenAI Agents SDK, Pydantic AI, LangChain, LangGraph,
+The package works with DSPy, OpenAI Agents SDK, Pydantic AI, LangChain, LangGraph,
 CrewAI, LlamaIndex, Claude Agent SDK, Microsoft Agent Framework, AutoGen,
 Haystack, Semantic Kernel, Agno, smolagents, and Google ADK. When one supported
 SDK family is installed, the package detects it automatically. See
@@ -20,7 +20,8 @@ SDK family is installed, the package detects it automatically. See
 example for each SDK.
 
 You can also use every search tool without an agent SDK by choosing
-`provider="function"`.
+`provider="function"`. For DSPy, install `dspy` and select
+`provider="dspy"` (or use `dspy.Tool.from_serpapi`, which selects it for you).
 
 ## Install
 

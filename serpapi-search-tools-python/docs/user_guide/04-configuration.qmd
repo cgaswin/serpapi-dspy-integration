@@ -40,7 +40,7 @@ All nine constructors accept these options:
 
 | Option | Default | When to use it |
 | --- | --- | --- |
-| `provider` | `"auto"` | Usually omit it. Select an SDK explicitly when multiple supported SDKs are installed, or use `"function"` for a callable. |
+| `provider` | `"auto"` | Usually omit it. Select an SDK explicitly when multiple supported SDKs are installed, use `"dspy"` with DSPy, or use `"function"` for a callable. |
 | `api_key` | `None` | Pass a SerpApi key from a secret manager instead of using an environment variable. |
 | `client` | `None` | Replace the built-in client for tests, caching, logging, retries, or response reduction. |
 | `default_params` | `None` | Set supported SerpApi options such as locale, currency, filters, or pagination in application code. |

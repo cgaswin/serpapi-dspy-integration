@@ -24,6 +24,7 @@ to `.env`, or export values in your shell. You always need `SERPAPI_API_KEY` or
 | `direct_marketplace_comparison.py` | Normalize marketplace results | none | Google Shopping, Amazon, Walmart, and eBay |
 | `direct_regioned_search.py` | Named regional tools | none | Two Google Light configurations |
 | `direct_cached_search.py` | Cache identical requests | none | Web with a custom client |
+| `dspy_openai.py` | Native DSPy ReAct research | `dspy` | Web |
 | `openai_agents_openai.py` | Agent chooses several verticals | `openai-agents` | Web, news, maps, and shopping |
 | `openai_agents_travel_planner.py` | Typed agent travel planning | `openai-agents` | Hotels, flights, and travel explore |
 | `pydantic_ai_openai.py` | Visual research | `pydantic-ai` | Images and web |
@@ -43,6 +44,7 @@ to `.env`, or export values in your shell. You always need `SERPAPI_API_KEY` or
 Run an agent example with its extra:
 
 ```bash
+uv run --isolated --no-project --with dspy --with serpapi-search-tools --with python-dotenv examples/dspy_openai.py
 uv run --isolated --no-project --with 'serpapi-search-tools[openai-agents]' --with python-dotenv examples/openai_agents_openai.py
 uv run --isolated --no-project --with 'serpapi-search-tools[openai-agents]' --with python-dotenv examples/openai_agents_travel_planner.py
 uv run --isolated --no-project --with 'serpapi-search-tools[langchain]' --with python-dotenv --with langchain-openai examples/langchain_grok.py

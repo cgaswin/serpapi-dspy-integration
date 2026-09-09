@@ -95,6 +95,7 @@ def test_supported_provider_set_matches_public_optional_integrations() -> None:
     assert set(PROVIDER_ALIASES.values()) == {
         "auto",
         "function",
+        "dspy",
         "langchain",
         "langgraph",
         "crewai",

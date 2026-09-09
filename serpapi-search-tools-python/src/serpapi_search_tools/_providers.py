@@ -7,6 +7,7 @@ from typing import Literal, TypeAlias
 ProviderName: TypeAlias = Literal[
     "auto",
     "function",
+    "dspy",
     "langchain",
     "langgraph",
     "crewai",
@@ -77,6 +78,9 @@ PROVIDER_SPECS: tuple[ProviderSpec, ...] = (
     ProviderSpec("agno", (), "agno", "agno"),
     ProviderSpec("smolagents", ("smol-agents",), "smolagents", "smolagents"),
     ProviderSpec("google-adk", ("google_adk", "adk"), "google-adk", "google-adk"),
+    # DSPy selects this adapter explicitly through Tool.from_serpapi; do not
+    # auto-detect it for unrelated SerpApi applications.
+    ProviderSpec("dspy", (), None, None),
     ProviderSpec("function", ("plain", "callable"), None, None),
 )
 

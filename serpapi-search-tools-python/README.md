@@ -37,7 +37,8 @@ If you want this package to install a compatible agent SDK too, choose its extra
 pip install "serpapi-search-tools[openai-agents]"
 ```
 
-Extras are available for all supported SDKs listed below.
+Extras are available for the SDKs listed below except DSPy, which is installed as
+the host package and selected with `provider="dspy"`.
 
 Set a SerpApi key:
 
@@ -53,6 +54,7 @@ export SERPAPI_API_KEY="your-key"
 |---------------------------|-----------------------------|------------------------------------------|
 | OpenAI Agents SDK         | `openai-agents`             | OpenAI Agents `FunctionTool`             |
 | Pydantic AI               | `pydantic-ai`               | Pydantic AI `Tool`                       |
+| DSPy                      | install `dspy` separately   | DSPy `Tool` with the shared input schema |
 | LangChain                 | `langchain`                 | LangChain `StructuredTool`               |
 | LangGraph                 | `langgraph`                 | LangChain-compatible structured tool     |
 | CrewAI                    | `crewai`                    | CrewAI `BaseTool`                        |
@@ -65,6 +67,9 @@ export SERPAPI_API_KEY="your-key"
 | Agno                      | `agno`                      | Agno `Function`                          |
 | smolagents                | `smolagents`                | smolagents `Tool`                        |
 | Google ADK                | `google-adk`                | Google ADK `FunctionTool`                |
+
+For DSPy, install `dspy` separately and use `dspy.Tool.from_serpapi(...)`; see
+the [DSPy example](https://serpapi.github.io/serpapi-search-tools-python/docs/sdk-examples/dspy.html).
 
 ## Quickstart: automatic SDK detection
 

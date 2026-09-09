@@ -1,0 +1,66 @@
+---
+title: DSPy
+description: Give a DSPy agent current SerpApi search results.
+---
+
+# DSPy
+
+`dspy.Tool.from_serpapi` converts SerpApi's shared search schema into a native
+DSPy `Tool`, so it can be passed directly to `dspy.ReAct`.
+
+## Install
+
+DSPy is the host package, so install it alongside SerpApi Search Tools:
+
+```bash
+pip install dspy serpapi-search-tools
+```
+
+Use a DSPy release that includes `Tool.from_serpapi`; when working before that
+release, install the DSPy checkout containing this integration instead.
+
+Set both keys:
+
+```bash
+export SERPAPI_API_KEY="your-serpapi-key"
+export OPENAI_API_KEY="your-openai-key"
+```
+
+## Run it
+
+```python
+import dspy
+
+
+class Research(dspy.Signature):
+    """Answer using current web evidence and cite source URLs."""
+
+    question: str = dspy.InputField()
+    answer: str = dspy.OutputField()
+
+
+dspy.configure(lm=dspy.LM("openai/gpt-4o-mini"))
+search = dspy.Tool.from_serpapi(result_limit=5, timeout=20.0)
+agent = dspy.ReAct(Research, tools=[search], max_iters=4)
+result = agent(question="What changed recently in Python packaging?")
+print(result.answer)
+```
+
+The SerpApi key is read from `SERPAPI_API_KEY` (or `SERPAPI_KEY`), while the
+model provider uses its own credential. The key and constructor settings stay
+out of the model-visible tool schema.
+
+## Customize the search
+
+```python
+from serpapi_search_tools import news_search
+
+news = dspy.Tool.from_serpapi(
+    news_search,
+    result_limit=3,
+    default_params={"hl": "en", "gl": "us"},
+)
+```
+
+Use the selected SerpApi constructor's documented arguments; required search
+fields and runtime validation remain enforced by SerpApi.

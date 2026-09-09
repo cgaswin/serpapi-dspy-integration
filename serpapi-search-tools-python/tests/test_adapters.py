@@ -66,6 +66,31 @@ class LlamaIndexFunctionTool:
         }
 
 
+class DspyTool:
+    def __init__(self, func, *, name, desc, args, **kwargs):
+        self.func = func
+        self.name = name
+        self.desc = desc
+        self.args = args
+        self.kwargs = kwargs
+
+
+def test_dspy_adapter_preserves_provider_schema(monkeypatch: pytest.MonkeyPatch) -> None:
+    module = ModuleType("dspy")
+    module.Tool = DspyTool
+    monkeypatch.setitem(sys.modules, "dspy", module)
+
+    tool = hotels_search(provider="dspy", client=FakeClient())
+
+    assert isinstance(tool, DspyTool)
+    assert tool.name == "hotels_search"
+    assert tool.desc.startswith("Search Google Hotels")
+    assert tool.args["check_in_date"]["description"]
+    assert tool.args["adults"]["minimum"] == 1
+    assert tool.args["children_ages"]["default"] is None
+    assert tool.args["children_ages"]["type"] == ["array", "null"]
+
+
 def test_langchain_adapter_preserves_structured_hotel_signature(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

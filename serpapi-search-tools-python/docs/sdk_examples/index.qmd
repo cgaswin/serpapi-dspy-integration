@@ -13,6 +13,7 @@ example.
 
 | SDK | Example |
 | --- | --- |
+| DSPy | [DSPy](dspy.html) |
 | OpenAI Agents SDK | [OpenAI Agents SDK](openai_agents.html) |
 | Pydantic AI | [Pydantic AI](pydantic_ai.html) |
 | LangChain | [LangChain](langchain.html) |
