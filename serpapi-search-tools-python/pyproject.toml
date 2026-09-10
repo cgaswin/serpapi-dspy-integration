@@ -210,6 +210,7 @@ source-exclude = ["/cookbook/**", "/examples/**", "/great-docs/**", "/.idea/**"]
 [tool.ty.analysis]
 allowed-unresolved-imports = [
     "agents",
+    "dspy",
     "agno.tools",
     "autogen_core.tools",
     "claude_agent_sdk",

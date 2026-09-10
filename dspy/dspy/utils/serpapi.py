@@ -4,7 +4,7 @@ import functools
 import inspect
 from typing import Any, Callable
 
-import anyio
+from anyio.to_thread import run_sync
 
 from dspy.adapters.types.tool import Tool
 from dspy.utils.asyncify import get_limiter
@@ -45,7 +45,7 @@ class _SerpApiTool(Tool):
         call = functools.partial(self, **kwargs)
         # Keep the limiter slot until the synchronous request finishes; abandoning a
         # cancelled worker would let new requests exceed async_max_workers.
-        return await anyio.to_thread.run_sync(call, abandon_on_cancel=False, limiter=get_limiter())
+        return await run_sync(call, abandon_on_cancel=False, limiter=get_limiter())
 
     def __getstate__(self):
         state = super().__getstate__()

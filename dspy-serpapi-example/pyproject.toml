@@ -13,3 +13,6 @@ dependencies = [
 [tool.uv.sources]
 dspy = { path = "../dspy", editable = true }
 serpapi-search-tools = { path = "../serpapi-search-tools-python", editable = true }
+
+[tool.ty.environment]
+extra-paths = ["../dspy"]
