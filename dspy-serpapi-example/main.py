@@ -34,7 +34,7 @@ class Research(dspy.Signature):
 
 def build_searches() -> dict[str, dspy.Tool]:
     """Build native DSPy tools for web, news, Maps, shopping, and images."""
-    common = {"result_limit": 3, "timeout": 20.0}
+    common = {"result_limit": 3, "timeout": 60.0}
     return {
         "web": dspy.Tool.from_serpapi(
             allowed_engines=["google_light"], name="web_search", **common
@@ -43,7 +43,7 @@ def build_searches() -> dict[str, dspy.Tool]:
         "maps": dspy.Tool.from_serpapi(maps_search, name="maps_search", **common),
         "shopping": dspy.Tool.from_serpapi(
             shopping_search,
-            allowed_engines=["google_shopping"],
+            allowed_engines=["amazon"],
             name="shopping_search",
             **common,
         ),
